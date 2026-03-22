@@ -1,0 +1,9 @@
+# Terraform
+terraform/.terraform/
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/terraform.tfvars
+
+# AWS CLI installer (not needed in repo)
+aws/
+awscliv2.zip
