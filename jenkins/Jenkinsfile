@@ -1,0 +1,55 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "autodeploy-monitor"
+        IMAGE_TAG  = "v1"
+    }
+
+    stages {
+
+        stage('Clone Repository') {
+            steps {
+                echo 'Cloning repository...'
+                git branch: 'master',
+                    url: 'https://github.com/Rajeshkamal/autoDeploy-monitor.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker image...'
+                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                echo 'Running tests...'
+                sh '''
+                    docker run --rm ${IMAGE_NAME}:${IMAGE_TAG} \
+                    python -c "import app; print('App imported successfully')"
+                '''
+            }
+        }
+
+        stage('Deploy Container') {
+            steps {
+                echo 'Deploying container...'
+                sh 'docker stop myapp || true'
+                sh 'docker rm myapp || true'
+                sh 'docker run -d -p 5000:5000 --name myapp --restart always ${IMAGE_NAME}:${IMAGE_TAG}'
+            }
+        }
+
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully! App is deployed.'
+        }
+        failure {
+            echo 'Pipeline failed! Check the logs above.'
+        }
+    }
+}
