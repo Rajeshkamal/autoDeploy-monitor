@@ -1,0 +1,30 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r app/requirements.txt
+
+      - name: Run app syntax check
+        run: python -m py_compile app/app.py && echo "Syntax OK"
+
+      - name: Trigger Jenkins Pipeline
+        run: |
+          curl -X POST http://3.110.213.18:8080/job/autodeploy-monitor/build \
+          --user admin:${{ secrets.JENKINS_TOKEN }}
