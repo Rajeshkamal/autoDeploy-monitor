@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autodeploy-monitor
+  labels:
+    app: autodeploy-monitor
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: autodeploy-monitor
+  template:
+    metadata:
+      labels:
+        app: autodeploy-monitor
+    spec:
+      containers:
+      - name: autodeploy-monitor
+        image: 940684223258.dkr.ecr.ap-south-1.amazonaws.com/autodeploy-monitor:v1
+        ports:
+        - containerPort: 5000
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
